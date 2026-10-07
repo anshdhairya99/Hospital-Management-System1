@@ -1,0 +1,62 @@
+### 1. Register a patient (public)
+POST http://localhost:8080/api/auth/register
+Content-Type: application/json
+
+{ "username": "alice", "password": "alice123", "fullName": "Alice Johnson", "age": 29,
+  "gender": "FEMALE", "phone": "9876500000", "address": "Kanpur", "bloodGroup": "B+" }
+
+### 2. Login as patient -> copy the token
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{ "username": "alice", "password": "alice123" }
+
+### 3. Search doctors (any logged-in user)
+GET http://localhost:8080/api/doctors?specialization=cardio
+Authorization: Bearer {{patientToken}}
+
+### 4. Book an appointment (PATIENT)  - use a future date
+POST http://localhost:8080/api/appointments
+Authorization: Bearer {{patientToken}}
+Content-Type: application/json
+
+{ "doctorId": 1, "appointmentTime": "2030-01-15T10:30:00", "reason": "Chest pain" }
+
+### 5. Login as doctor (seeded)
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{ "username": "dr.smith", "password": "doctor123" }
+
+### 6. Doctor confirms appointment
+PATCH http://localhost:8080/api/appointments/1/status?status=CONFIRMED
+Authorization: Bearer {{doctorToken}}
+
+### 7. Doctor writes prescription
+POST http://localhost:8080/api/prescriptions
+Authorization: Bearer {{doctorToken}}
+Content-Type: application/json
+
+{ "appointmentId": 1, "diagnosis": "Mild angina", "medicines": "Aspirin 75mg once daily", "notes": "Review after 2 weeks" }
+
+### 8. Patient views prescriptions
+GET http://localhost:8080/api/prescriptions/my
+Authorization: Bearer {{patientToken}}
+
+### 9. Admin login (seeded) and dashboard stats
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{ "username": "admin", "password": "admin123" }
+
+###
+GET http://localhost:8080/api/admin/stats
+Authorization: Bearer {{adminToken}}
+
+### 10. Admin creates a doctor
+POST http://localhost:8080/api/admin/doctors
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{ "username": "dr.rao", "password": "doctor123", "fullName": "Dr. Meera Rao", "specialization": "Neurologist",
+  "phone": "9000000001", "consultationFee": 700, "departmentId": 2 }
